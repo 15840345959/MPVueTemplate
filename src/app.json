@@ -1,0 +1,57 @@
+{
+  "pages": [
+    {
+      "path": "pages/index",
+      "config": {
+        "navigationBarTitleText": "首页",
+        "enablePullDownRefresh": true,
+        "usingComponents": {
+          "i-button": "../static/iview/button/index"
+        }
+      }
+    },
+    {
+      "path": "pages/authorization",
+      "config": {
+        "navigationBarTitleText": "授权页",
+        "enablePullDownRefresh": true
+      }
+    }
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "WeChat",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#b8b8ba",
+    "selectedColor": "#b8b8ba",
+    "list": [
+      {
+        "pagePath": "pages/index",
+        "text": "导航1",
+        "iconPath": "/static/icon/index.png",
+        "selectedIconPath": "/static/icon/index-s.png"
+      },
+      {
+        "pagePath": "pages/index",
+        "text": "导航2",
+        "iconPath": "/static/icon/caiji.png",
+        "selectedIconPath": "/static/icon/caiji-s.png"
+      },
+      {
+        "pagePath": "pages/index",
+        "text": "导航3",
+        "iconPath": "/static/icon/liangbiao.png",
+        "selectedIconPath": "/static/icon/liangbiao-s.png"
+      },
+      {
+        "pagePath": "pages/index",
+        "text": "导航4",
+        "iconPath": "/static/icon/my.png",
+        "selectedIconPath": "/static/icon/my-s.png"
+      }
+    ]
+  }
+}
