@@ -19,6 +19,14 @@ export function showToast(title) {
     duration: 1500,
   })
 }
+// 校验手机号
+export function checkPhone(phone) {
+  if (!(/^1[34578]\d{9}$/.test(phone))) {
+    return false;
+  } else {
+    return true
+  }
+}
 //判断是否有空字符串
 export function judgeIsAnyNullStr() {
   if (arguments.length > 0) {

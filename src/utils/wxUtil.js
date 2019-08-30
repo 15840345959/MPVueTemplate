@@ -6,16 +6,12 @@ import qiniuUploader from '../utils/qiniuUploader'
 
 //获取七牛上传token 并 初始化七牛相关参数
 export async function getQiniuToken() {
-    let qnToken = wx.getStorageSync("qnToken");
-    if (!qnToken) {
-        let qnToken = await fly
-            .request({
-                method: api.getQiniuToken.method,
-                url: api.getQiniuToken.url,
-                body: {}
-            })
-        wx.setStorageSync('qnToken', qnToken)
-    }
+    let qnToken = await fly
+        .request({
+            method: api.getQiniuToken.method,
+            url: api.getQiniuToken.url,
+            body: {}
+        })
     // console.log("qiniu upload token:" + qnToken)
     let options = {
         region: 'ECN', // 华东区
@@ -55,6 +51,59 @@ export function chooseImage() {
             }
         });
     })
+}
+
+export function uploadImg(img) {
+    return new Promise((resolve, reject) => {
+        qiniuUploader.upload(
+            img,
+            res => {
+                wx.hideLoading()
+                let image = getImgRealUrl(res.key);
+                resolve(image)
+            },
+            error => {
+                console.error("七牛上传图片err: " + JSON.stringify(error));
+                reject(error)
+            }
+        );
+    })
+}
+
+//图片下载到本地
+export function saveImage(image) {
+    return new Promise((resolve, reject) => {
+        console.log("图片下载到本地：" + JSON.stringify(image));
+        //下载到本地
+        wx.downloadFile({
+            url: image,
+            success: function (res) {
+                if (res.statusCode === 200) {
+                    wx.saveImageToPhotosAlbum({
+                        filePath: res.tempFilePath,
+                        success(res) {
+                            wx.hideLoading();
+                            console.log("保存成功");
+                            resolve(true);
+                        },
+                        fail(e) {
+                            wx.hideLoading();
+                            // if (e.errMsg == "saveImageToPhotosAlbum:fail auth deny") {}
+                            if (e.errMsg != "saveImageToPhotosAlbum:fail cancel") {
+                                // vm.showDialog()
+                            }
+                            console.log("saveImageToPhotosAlbum错误:" + JSON.stringify(e));
+                            resolve(false);
+                        }
+                    });
+                }
+            },
+            fail: function (e) {
+                resolve(false);
+                console.log("downloadFile错误：：：" + JSON.stringify(e));
+            }
+        });
+    });
 }
 
 // 七牛上传图片
