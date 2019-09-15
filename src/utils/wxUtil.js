@@ -449,6 +449,7 @@ export function getSetting(authType) {
         })
     })
 }
+
 export function showToast(title) {
     wx.showToast({
         title,
@@ -456,6 +457,57 @@ export function showToast(title) {
         duration: 2000
     })
 }
+
+//搜索历史相关操作
+// 将搜索历史存入本地缓存，在获取搜索历史时从本地缓存中获取
+//本地缓存名称为seach_word_storage_arr，数组形式
+
+/*
+ * 获取缓存数据
+ *
+ * By TerryQi
+ * 2019-09-15
+ * 
+ * @param max_history_words_num：需要获取的最多的历史纪录数目
+ * 
+ * @return [];
+ * 
+ */
+export function getSearchHistoryWords(max_history_words_num) {
+
+    var search_history_word_arr = wx.getStorageSync("search_history_word_arr");
+    //首次搜索，没有搜索历史，返回空数组
+    if (!search_history_word_arr) {
+        return [];
+    }
+    if (search_history_word_arr.length > max_history_words_num) {
+        search_history_word_arr = search_history_word_arr.slice(0, max_history_words_num - 1);
+    }
+    return search_history_word_arr;
+}
+
+/*
+ * 将搜索历史存入数组
+ *
+ * @param search_word
+ * 
+ * @return [],存入后的最新历史搜索数组
+ *
+ */
+export function storeSearchHistoryWord(search_word, max_history_words_num = 10) {
+
+    let search_history_word_arr = wx.getStorageSync("search_history_word_arr");
+    //首次搜索，没有搜索历史，返回空数组
+    if (!search_history_word_arr) {
+        search_history_word_arr = [];
+    }
+
+    search_history_word_arr.unshift(search_word); //插入到首位
+    wx.setStorageSync("search_history_word_arr", search_history_word_arr);
+    getSearchHistoryWords(max_history_words_num);
+}
+
+
 //展示Modal
 export function showModal(title, content, showCancel = false, call) {
     wx.showModal({

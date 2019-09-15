@@ -3,6 +3,7 @@ import { judgeIsAnyNullStr } from './api-common'
 const fly = new Fly()
 const DEDUG = 3
 let host = ""
+
 switch (DEDUG) {
   case 1: host = 'https://ylc.isart.me/api/'; break;            //正式环境
   case 2: host = 'http://defky.isart.me/api/'; break;           //测试环境
