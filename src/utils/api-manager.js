@@ -13,7 +13,6 @@ switch (DEDUG) {
 // 添加请求拦截器
 fly.interceptors.request.use((request) => {
   // console.log("-----");
-
   wx.showLoading({
     title: '加载中',
     mask: true
@@ -35,21 +34,13 @@ fly.interceptors.request.use((request) => {
   }
   return request
 })
+
 // 添加响应拦截器
 fly.interceptors.response.use(
   async (response) => {
     wx.hideLoading()
-
-    //用户信息错误
-    if (response.data.code == 101 || response.data.code == 102 || response.data.code == 103) {
-      showToast('用户信息错误');
-      await auth_login()
-      console.log("重新登录成功")
-      return false
-    }
-
     // console.log("----", JSON.stringify(response))
-    return response.data.ret // 请求成功之后将返回值返回
+    return response // 请求成功之后将返回值返回
   },
   (err) => {
     // 请求出错，根据返回状态码判断出错原因
