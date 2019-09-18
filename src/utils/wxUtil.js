@@ -13,6 +13,8 @@ export async function getQiniuToken() {
             body: {}
         })
     // console.log("qiniu upload token:" + qnToken)
+    let qnToken = res.data.ret
+
     let options = {
         region: 'ECN', // 华东区
         uptoken: qnToken
@@ -220,7 +222,7 @@ export function wxLogin() {
 export async function auth_login() {
     let code = await wxLogin()
     console.log("code::：" + JSON.stringify(code));
-    let wechat_login_res = await fly
+    let ret = await fly
         .request({
             method: api.wechat_login.method,
             url: api.wechat_login.url,
@@ -229,8 +231,16 @@ export async function auth_login() {
                 code
             }
         })
+
+    let wechat_login_res = ret.data.ret
     console.log("登陆成功接口调用成功：" + JSON.stringify(wechat_login_res));
-    wx.setStorageSync('userInfo', wechat_login_res)
+
+    if (wechat_login_res) {
+        wx.setStorageSync('userInfo', wechat_login_res)
+    } else {
+        wx.removeStorageSync('userInfo')
+    }
+
     return wechat_login_res
 }
 
@@ -333,7 +343,7 @@ export async function updateUserinfo() {
 }
 //消息解密
 export async function decryptData(encrypted_data, iv, code) {
-    let userInfo = await fly.request({
+    let ret = await fly.request({
         method: api.wechat_decryptData.method,
         url: api.wechat_decryptData.url,
         body: {
@@ -342,42 +352,11 @@ export async function decryptData(encrypted_data, iv, code) {
             iv: base64encode(iv)
         }
     })
+    let userInfo = ret.data.ret
     console.log("消息解密" + JSON.stringify(userInfo));
     if (userInfo) {
         wx.setStorageSync('userInfo', userInfo)
     }
-    return userInfo
-}
-
-//消息解密并登陆
-export async function wechat_decryptData(encrypted_data, iv) {
-    let code = await wxLogin()
-    console.log("wxLogin成功：" + code);
-    console.log("code：" + JSON.stringify(code));
-    let wechat_decryptData_param = {
-        code: code,
-        encryptedData: base64encode(encrypted_data),
-        iv: base64encode(iv)
-    };
-    let wechat_decryptData_res = await post(config.wechat_decryptData, wechat_decryptData_param)
-    // console.log("消息解密接口成功：" + JSON.stringify(wechat_decryptData_res));
-    let old_userInfo = wx.getStorageSync("userInfo");
-    let user_id = old_userInfo.id;
-    let new_userInfo = wechat_decryptData_res;
-    let user_updateById_param = {
-        user_id: user_id,
-        avatar: new_userInfo.avatarUrl,
-        nick_name: new_userInfo.nickName,
-        gender: new_userInfo.gender,
-        country: new_userInfo.country,
-        province: new_userInfo.province,
-        city: new_userInfo.city,
-        language: new_userInfo.language
-    };
-    let user_updateById_res = await post(config.user_updateById, user_updateById_param)
-    // console.log("根据id编辑用户信息接口调用成功" + JSON.stringify(user_updateById_res));
-    let userInfo = user_updateById_res;
-    wx.setStorageSync('userInfo', wechat_login_res)
     return userInfo
 }
 
@@ -419,6 +398,7 @@ export function updataXcx() {
         })
     }
 }
+
 //判断是否授权过
 export function getSetting(authType) {
     return new Promise((resolve, reject) => {
@@ -429,7 +409,6 @@ export function getSetting(authType) {
                     wx.authorize({
                         scope: authType,
                         success(res) {
-                            // console.log("哈哈哈:::" + JSON.stringify(res));
                             resolve(true)
                         },
                         fail() {
@@ -438,7 +417,6 @@ export function getSetting(authType) {
                         }
                     })
                 } else {
-                    // console.log("哈哈哈:::" + JSON.stringify(res));
                     resolve(true)
                 }
             },
@@ -474,7 +452,6 @@ export function showToast(title) {
  * 
  */
 export function getSearchHistoryWords(max_history_words_num) {
-
     var search_history_word_arr = wx.getStorageSync("search_history_word_arr");
     //首次搜索，没有搜索历史，返回空数组
     if (!search_history_word_arr) {
@@ -495,13 +472,11 @@ export function getSearchHistoryWords(max_history_words_num) {
  *
  */
 export function storeSearchHistoryWord(search_word, max_history_words_num = 10) {
-
     let search_history_word_arr = wx.getStorageSync("search_history_word_arr");
     //首次搜索，没有搜索历史，返回空数组
     if (!search_history_word_arr) {
         search_history_word_arr = [];
     }
-
     search_history_word_arr.unshift(search_word); //插入到首位
     wx.setStorageSync("search_history_word_arr", search_history_word_arr);
     getSearchHistoryWords(max_history_words_num);
