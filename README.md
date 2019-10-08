@@ -1,6 +1,6 @@
-# original
+# mpvue-template
 
-> 康复-原始环境
+> isart mpvue小程序白板文件
 
 ## Build Setup
 

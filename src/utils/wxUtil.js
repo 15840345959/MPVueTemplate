@@ -6,7 +6,7 @@ import qiniuUploader from '../utils/qiniuUploader'
 
 //获取七牛上传token 并 初始化七牛相关参数
 export async function getQiniuToken() {
-    let qnToken = await fly
+    let res = await fly
         .request({
             method: api.getQiniuToken.method,
             url: api.getQiniuToken.url,
@@ -511,6 +511,52 @@ export function setShareInfo(shareJson) {
     };
 }
 
+//获取分享参数
+export function getShareInfo(appParam) {
+    let scene = appParam.scene;
+    scene = decodeURIComponent(scene);
+    let shareInfo = {};
+    if (!judgeIsAnyNullStr(scene)) {
+        let mch_code = getQueryString("code", scene); //scene中code
+        let id = getQueryString("id", scene); //文章详情页面文章id
+        if (!judgeIsAnyNullStr(mch_code)) {
+            shareInfo.mch_code = mch_code;
+        }
+        if (!judgeIsAnyNullStr(id)) {
+            shareInfo.id = id;
+        }
+    }
+
+    if (!judgeIsAnyNullStr(appParam.a_user_id)) {
+        shareInfo.a_user_id = appParam.a_user_id;
+        fly
+            .request({
+                method: api.userInvite_record.method,
+                url: api.userInvite_record.url,
+                body: { a_user_id: appParam.a_user_id }
+            }).then(res => {
+                console.log("被邀请记录分享信息：" + JSON.stringify(res))
+                if (res) {
+                    if (res.is_popup_flag) {
+                        showModal('邀请成功', '您通过好友的邀请进入小程序,成功为好友助力~', false, ret => { })
+                    }
+                }
+            });
+    }
+    if (!judgeIsAnyNullStr(appParam.shop_store_id)) {
+        shareInfo.shop_store_id = appParam.shop_store_id;
+    }
+    return shareInfo;
+}
+
+//获取参数
+export function getQueryString(name, url) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+    var r = url.substr(1).match(reg);
+    if (r != null) return unescape(r[2]);
+    return null;
+}
+
 //展示loadding
 export function showLoading(title) {
     if (!wx.canIUse('showLoading')) {
@@ -525,7 +571,6 @@ export function showLoading(title) {
 }
 export default {
     wxLogin,
-    wechat_decryptData,
     auth_login,
     getWindowHeight,
     getQiniuToken,

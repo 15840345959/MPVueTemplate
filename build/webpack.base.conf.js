@@ -12,18 +12,18 @@ var relative = require('relative')
 
 const MpvueEntry = require('mpvue-entry')
 
-function resolve (dir) {
+function resolve(dir) {
   return path.join(__dirname, '..', dir)
 }
 
-function getEntry (rootSrc) {
+function getEntry(rootSrc) {
   var map = {};
   glob.sync(rootSrc + '/pages/**/main.js')
-  .forEach(file => {
-    var key = relative(rootSrc, file).replace('.js', '');
-    map[key] = file;
-  })
-   return map;
+    .forEach(file => {
+      var key = relative(rootSrc, file).replace('.js', '');
+      map[key] = file;
+    })
+  return map;
 }
 
 const appEntry = { app: resolve('./src/main.js') }
@@ -35,8 +35,8 @@ let baseWebpackConfig = {
   // 可以将 entry 写成 {'toPath': 'fromPath'} 的形式，
   // toPath 为相对于 dist 的路径, 例：index/demo，则生成的文件地址为 dist/index/demo.js
 
-  entry: MpvueEntry.getEntry('src/app.json'),
   // entry,
+  entry: MpvueEntry.getEntry('src/app.json'),
   target: require('mpvue-webpack-target'),
   output: {
     path: config.build.assetsRoot,
@@ -70,7 +70,7 @@ let baseWebpackConfig = {
           'babel-loader',
           {
             loader: 'mpvue-loader',
-            options: Object.assign({checkMPEntry: true}, vueLoaderConfig)
+            options: Object.assign({ checkMPEntry: true }, vueLoaderConfig)
           },
         ]
       },
@@ -101,9 +101,7 @@ let baseWebpackConfig = {
     ]
   },
   plugins: [
-
     new MpvueEntry(),
-
     // api 统一桥协议方案
     new webpack.DefinePlugin({
       'mpvue': 'global.mpvue',
