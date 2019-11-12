@@ -13,7 +13,7 @@ export async function getQiniuToken() {
             body: {}
         })
     // console.log("qiniu upload token:" + qnToken)
-    let qnToken = res.data.ret
+    let qnToken = res.ret
 
     let options = {
         region: 'ECN', // 华东区
@@ -232,7 +232,7 @@ export async function auth_login() {
             }
         })
 
-    let wechat_login_res = ret.data.ret
+    let wechat_login_res = ret.ret
     console.log("登陆成功接口调用成功：" + JSON.stringify(wechat_login_res));
 
     if (wechat_login_res) {
@@ -352,7 +352,7 @@ export async function decryptData(encrypted_data, iv, code) {
             iv: base64encode(iv)
         }
     })
-    let userInfo = ret.data.ret
+    let userInfo = ret.ret
     console.log("消息解密" + JSON.stringify(userInfo));
     if (userInfo) {
         wx.setStorageSync('userInfo', userInfo)
